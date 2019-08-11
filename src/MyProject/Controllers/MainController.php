@@ -2,22 +2,27 @@
 
 namespace MyProject\Controllers;
 
+use MyProject\Models\Articles\Article;
+use MyProject\Services\Db;
+use MyProject\View\View;
+
 class MainController
 {
+    /** @var View */
+    private $view;
+
+    /** @var Db */
+    private $db;
+
+    public function __construct()
+    {
+        $this->view = new View(__DIR__ . '/../../../templates');
+        $this->db = new Db();
+    }
+
     public function main()
     {
-        $articles = [
-            ['name' => 'Статья 1', 'text' => 'Текст статьи 1'],
-            ['name' => 'Статья 2', 'text' => 'Текст статьи 2'],
-        ];
-        include __DIR__ . '/../../../templates/main/main.php';
-    }
-    public function sayHello(string $name)
-    {
-        echo 'Привет, ' . $name;
-    }
-    public function sayBye(string $name)
-    {
-        echo 'Пока, ' . $name;
+        $articles = Article::findAll();
+        $this->view->renderHtml('main/main.php', ['articles' => $articles]);
     }
 }

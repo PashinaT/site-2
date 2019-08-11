@@ -28,3 +28,4 @@ $actionName = $controllerAndAction[1];
 
 $controller = new $controllerName();
 $controller->$actionName(...$matches); //лементы массива передать в аргументы метода
+
