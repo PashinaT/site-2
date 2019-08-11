@@ -17,7 +17,7 @@ class ArticlesController
     public function __construct()
     {
         $this->view = new View(__DIR__ . '/../../../templates');
-        $this->db = Db::getInstance();;
+        $this->db = Db::getInstance();
     }
 
     public function view(int $articleId)
