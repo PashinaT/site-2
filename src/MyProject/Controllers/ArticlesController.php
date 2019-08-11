@@ -20,6 +20,7 @@ class ArticlesController
         $this->db = Db::getInstance();
     }
 
+
     public function view(int $articleId)
     {
         $article = Article::getById($articleId);
