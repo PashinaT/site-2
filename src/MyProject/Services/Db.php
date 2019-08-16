@@ -1,6 +1,7 @@
 <?php
 
 namespace MyProject\Services;
+use MyProject\Exceptions\DbException;
 
 class Db
 {
@@ -12,12 +13,16 @@ class Db
     {
         $dbOptions = (require __DIR__ . '/../../settings.php')['db'];
 
-        $this->pdo = new \PDO(
-            'mysql:host=' . $dbOptions['host'] . ';dbname=' . $dbOptions['dbname'],
-            $dbOptions['user'],
-            $dbOptions['password']
-        );
-        $this->pdo->exec('SET NAMES UTF8');
+        try {
+            $this->pdo = new \PDO(
+                'mysql:host=' . $dbOptions['host'] . ';dbname=' . $dbOptions['dbname'],
+                $dbOptions['user'],
+                $dbOptions['password']
+            );
+            $this->pdo->exec('SET NAMES UTF8');
+        } catch (\PDOException $e) {
+            throw new DbException('Ошибка при подключении к базе данных: ' . $e->getMessage());
+        }
     }
     public static function getInstance(): self //Singleton - создаём объект класса один раз
     {
@@ -38,6 +43,11 @@ class Db
         }
 
         return $sth->fetchAll(\PDO::FETCH_CLASS, $className); //константу - \PDO::FETCH_CLASS говорит о том, что нужно вернуть результат в виде объектов какого-то класса. Второй аргумент – это имя класса, которое мы можем передать в метод query().
+    }
+
+    public function getLastInsertId():int
+    {
+        return (int) $this->pdo->lastInsertId();
     }
 
 }
