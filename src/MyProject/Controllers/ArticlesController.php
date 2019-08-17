@@ -4,22 +4,12 @@ namespace MyProject\Controllers;
 
 use MyProject\Exceptions\NotFoundException;
 use MyProject\Services\Db;
+use MyProject\Services\UsersAuthService;
 use MyProject\View\View;
 use MyProject\Models\Articles\Article;
 use MyProject\Models\Users\User;
-class ArticlesController
+class ArticlesController extends AbstractController
 {
-    /** @var View */
-    private $view;
-
-    /** @var Db */
-    private $db;
-
-    public function __construct()
-    {
-        $this->view = new View(__DIR__ . '/../../../templates');
-        $this->db = Db::getInstance();
-    }
 
     public function view(int $articleId)
     {

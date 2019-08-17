@@ -14,4 +14,9 @@
         </td>
     </tr>
     <tr>
+        <td colspan="2" style="text-align: right">
+            <?= !empty($user) ? 'Привет, ' . $user->getNickname().'|<a href="http://site-2/users/logout">Выйти</a>': '<a href="http://site-2/users/login">Войти</a>| <a href="http://site-2/users/register">Зарегистрироваться</a>' ?>
+        </td>
+    </tr>
+    <tr>
         <td>
