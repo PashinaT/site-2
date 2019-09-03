@@ -2,7 +2,10 @@
 
 namespace MyProject\Controllers;
 
+use MyProject\Exceptions\Forbidden;
+use MyProject\Exceptions\InvalidArgumentException;
 use MyProject\Exceptions\NotFoundException;
+use MyProject\Exceptions\UnauthorizedException;
 use MyProject\Services\Db;
 use MyProject\Services\UsersAuthService;
 use MyProject\View\View;
@@ -26,33 +29,57 @@ class ArticlesController extends AbstractController
 
     public function edit(int $articleID): void
     {
-        $article=Article::getById($articleID);
+        $article = Article::getById($articleID);
 
-        if($article === null)
-        {
-            $this->view->renderHtml('errors/404.php',[],404);
-            return;
+        if ($article === null) {
+            throw new NotFoundException();
         }
 
-        $article->setName("New Name of the article");
-        $article->setText("Text about something new");
+        if ($this->user === null) {
+            throw new UnauthorizedException();
+        }
+        if($this->user->getRole()!=='admin')
+        {
+            throw new Forbidden();
+        }
 
-        $article->save();
+        if (!empty($_POST)) {
+            try {
+                $article->updateFromArray($_POST);
+            } catch (InvalidArgumentException $e) {
+                $this->view->renderHtml('articles/edit.php', ['error' => $e->getMessage(), 'article' => $article]);
+                return;
+            }
+
+            header('Location: /articles/' . $article->getId(), true, 302);
+            exit();
+        }
+
+        $this->view->renderHtml('articles/edit.php', ['article' => $article]);
 
     }
     public function add(): void
     {
-        $date = date('Y-m-d H:i:s');
-        $author = User::getById(1);
-        $article= new Article();
-        $article->setName("How old?");
-        $article->setText("One day I will ba 60");
-        $article->setAuthor($author);
-        $article->setCreatedAt($date);
+        if ($this->user === null) {
+            throw new UnauthorizedException();
+        }
+        if($this->user->getRole()!=='admin')
+        {
+            throw new Forbidden();
+        }
+        if (!empty($_POST)) {
+            try {
+                $article = Article::createFromArray($_POST, $this->user);
+            } catch (InvalidArgumentException $e) {
+                $this->view->renderHtml('articles/add.php', ['error' => $e->getMessage()]);
+                return;
+            }
 
+            header('Location: /articles/' . $article->getId(), true, 302);
+            exit();
+        }
 
-        $article->save();
-       var_dump($article);
+        $this->view->renderHtml('articles/add.php');
     }
 
     public function delete (int $id) : void

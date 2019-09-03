@@ -91,6 +91,11 @@ class User extends ActiveRecordEntity
         return $this->passwordHash;
     }
 
+    public function getRole(): string
+    {
+        return $this->role;
+    }
+
 
     //при успешном входе auth token пользователя в базе обновляется – все его предыдущие сессии станут недействительными
     public function refreshAuthToken()
